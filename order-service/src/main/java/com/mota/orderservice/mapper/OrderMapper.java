@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class OrderMapper implements ObjectMapper<OrderEntity, OrderDTO> {
 
-  private final ProductConnector productConnector;
+  private final ProductConnector productConnectorProxy;
 
   @Override
   public OrderDTO toDTO(OrderEntity entity) {
@@ -20,7 +20,7 @@ public class OrderMapper implements ObjectMapper<OrderEntity, OrderDTO> {
     List<Integer> orderProductIds = entity
         .getProducts().stream()
         .map(OrderProductEntity::getProductId).toList();
-    orderDTO.setProducts(productConnector.getAllByProductIds(orderProductIds));
+    orderDTO.setProducts(productConnectorProxy.getAllByProductIds(orderProductIds));
     return orderDTO;
   }
 

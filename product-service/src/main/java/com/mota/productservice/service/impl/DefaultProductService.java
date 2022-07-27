@@ -15,8 +15,28 @@ public class DefaultProductService implements ProductService {
 
   private final ProductDAO productDAO;
 
+  private boolean enabled = true;
+
+  @Override
+  public void disable() {
+    enabled = false;
+  }
+
+  @Override
+  public void enable() {
+    enabled = true;
+  }
+
+  @Override
+  public boolean getStatus() {
+    return enabled;
+  }
+
   @Override
   public List<ProductDTO> getByProductIds(List<Integer> productIds) {
+    if(!enabled) {
+      throw new RuntimeException("Service is not responding!");
+    }
     List<ProductEntity> productEntities = productDAO.getAllByProductIds(productIds);
     return productEntities.stream()
         .map(ProductDTO::new)

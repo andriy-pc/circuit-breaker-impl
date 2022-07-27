@@ -18,6 +18,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 
 @Connector
@@ -41,32 +42,54 @@ public class DefaultProductConnector implements ProductConnector {
 
   @Override
   public List<ProductDTO> getAllByProductIds(List<Integer> productIds) {
+    Request request = constructRequest(productIds);
+
+    try (Response response = executeRequest(request);
+        ResponseBody responseBody = response.body()) {
+      return extractProductsFromResponse(responseBody);
+    } catch (IOException e) {
+      log.error(
+          "Exception occurred during requesting products by ids. Empty product list will be returned."
+              + " Exception: ", e);
+    }
+    return Collections.emptyList();
+  }
+
+  @Override
+  public String getDetails() {
+    return this.getClass().getSimpleName();
+  }
+
+  List<ProductDTO> extractProductsFromResponse(ResponseBody responseBody) throws IOException {
+    if (Objects.nonNull(responseBody)) {
+      String responseBodyString = responseBody.string();
+      return deserializeProducts(responseBodyString);
+    } else {
+      log.warn("Response body from product-service is NULL. Empty product list will be returned");
+      return Collections.emptyList();
+    }
+  }
+
+  @NotNull
+  Request constructRequest(List<Integer> productIds) {
     HttpUrl url = buildURL(productIds);
 
     Request request = new Request.Builder()
         .url(url)
         .get()
         .build();
+    return request;
+  }
 
-    try (Response response = okHttpClient.newCall(request).execute();
-        ResponseBody responseBody = response.body()) {
-      if (Objects.nonNull(responseBody)) {
-        String responseBodyString = responseBody.string();
-        return convertStringToObject(responseBodyString);
-      } else {
-        log.warn("Response body from product-service is NULL. Empty product list will be returned");
-      }
-    } catch (IOException e) {
-      log.error("Exception occurred during requesting products by ids. Empty product list will be returned."
-          + " Exception: ", e);
-    }
-    return Collections.emptyList();
+  @NotNull
+  Response executeRequest(Request request) throws IOException {
+    return okHttpClient.newCall(request).execute();
   }
 
   private HttpUrl buildURL(List<Integer> productIds) {
     Optional<String> queryParam = Optional.empty();
     try {
-      queryParam = Optional.of(ListToString(productIds));
+      queryParam = Optional.of(productIdsToQueryParam(productIds));
     } catch (JsonProcessingException e) {
       log.error("Exception occurred during building request URL to get products by ids. "
           + "Empty request param will be returned. "
@@ -81,12 +104,12 @@ public class DefaultProductConnector implements ProductConnector {
         .build();
   }
 
-  private String ListToString(List<Integer> productIds) throws JsonProcessingException {
+  private String productIdsToQueryParam(List<Integer> productIds) throws JsonProcessingException {
     return objectMapper.writeValueAsString(productIds)
         .replaceAll(NON_DIGIT_REGEX, EMPTY_STRING);
   }
 
-  private List<ProductDTO> convertStringToObject(String serializedProducts) {
+  private List<ProductDTO> deserializeProducts(String serializedProducts) {
     try {
       return objectMapper.readValue(serializedProducts, new TypeReference<List<ProductDTO>>() {
       });

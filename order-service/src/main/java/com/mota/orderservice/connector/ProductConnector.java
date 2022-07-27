@@ -7,4 +7,6 @@ public interface ProductConnector {
 
   List<ProductDTO> getAllByProductIds(List<Integer> productIds);
 
+  String getDetails();
+
 }
