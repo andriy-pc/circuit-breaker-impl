@@ -1,5 +1,7 @@
-package com.mota.orderservice.connector.impl;
+package com.mota.orderservice.connector.impl.cirtuitbreaker.strategy;
 
+import com.mota.orderservice.connector.impl.ProductConnectorHelper;
+import com.mota.orderservice.connector.impl.cirtuitbreaker.CircuitBreakerStrategiesHolder;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
@@ -19,7 +21,8 @@ public abstract class AbstractCircuitBreakerStrategy implements CircuitBreakerSt
   private static final Long STATISTICS_LIVE_PERIOD_MILLIS = Duration.ofSeconds(5).toMillis();
   protected static final BigDecimal INITIAL_CALLS_COUNT = BigDecimal.valueOf(10);
 
-  protected final DefaultProductConnector defaultProductConnector;
+  protected final ProductConnectorHelper productConnectorHelper;
+
   protected CircuitBreakerStrategiesHolder circuitBreakerStrategiesHolder;
   private int countOfAllRequests = 0;
   private int failedRequestsCount = 0;
@@ -55,9 +58,9 @@ public abstract class AbstractCircuitBreakerStrategy implements CircuitBreakerSt
   public String getDetails() {
     return String.format("Strategy: %s\n"
             + "count of recorded requests: %d\n"
-            + "count of failed request: %d\n"
+            + "count of failed requests: %d\n"
             + "statistics will be reset on: %d\n"
-            + "percentage of failed request: %f",
+            + "percentage of failed requests: %f",
         this.getClass().getSimpleName(),
         countOfAllRequests,
         failedRequestsCount,

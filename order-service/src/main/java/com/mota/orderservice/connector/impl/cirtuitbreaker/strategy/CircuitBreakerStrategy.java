@@ -1,4 +1,4 @@
-package com.mota.orderservice.connector.impl;
+package com.mota.orderservice.connector.impl.cirtuitbreaker.strategy;
 
 import com.mota.orderservice.dto.ProductDTO;
 import java.util.List;

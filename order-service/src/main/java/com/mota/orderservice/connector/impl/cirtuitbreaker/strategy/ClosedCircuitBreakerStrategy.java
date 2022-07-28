@@ -1,5 +1,6 @@
-package com.mota.orderservice.connector.impl;
+package com.mota.orderservice.connector.impl.cirtuitbreaker.strategy;
 
+import com.mota.orderservice.connector.impl.ProductConnectorHelper;
 import com.mota.orderservice.dto.ProductDTO;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -17,20 +18,20 @@ import org.springframework.stereotype.Service;
 @Qualifier("closedCircuitBreakerStrategy")
 public class ClosedCircuitBreakerStrategy extends AbstractCircuitBreakerStrategy {
 
-  public ClosedCircuitBreakerStrategy(DefaultProductConnector defaultProductConnector) {
-    super(defaultProductConnector);
+  public ClosedCircuitBreakerStrategy(ProductConnectorHelper productConnectorHelper) {
+    super(productConnectorHelper);
   }
 
   @Override
   public List<ProductDTO> applyStrategy(List<Integer> productIds) {
-    Request request = defaultProductConnector.constructRequest(productIds);
-    try (Response response = defaultProductConnector.executeRequest(request);
+    Request request = productConnectorHelper.constructRequest(productIds);
+    try (Response response = productConnectorHelper.executeRequest(request);
         ResponseBody responseBody = response.body()) {
       addCallResultToStatistics(response);
       if (!response.isSuccessful()) {
         return Collections.emptyList();
       }
-      return defaultProductConnector.extractProductsFromResponse(responseBody);
+      return productConnectorHelper.extractProductsFromResponse(responseBody);
     } catch (IOException e) {
       increaseCountOfMadeCalls();
       increaseCountOfFailedCalls();
@@ -40,7 +41,6 @@ public class ClosedCircuitBreakerStrategy extends AbstractCircuitBreakerStrategy
     }
     return Collections.emptyList();
   }
-
 
   @Override
   public boolean shouldNewStrategyBeApplied() {

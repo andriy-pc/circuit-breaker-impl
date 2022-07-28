@@ -1,6 +1,7 @@
 package com.mota.orderservice.connector.impl;
 
 import com.mota.orderservice.connector.ProductConnector;
+import com.mota.orderservice.connector.impl.cirtuitbreaker.strategy.CircuitBreakerStrategy;
 import com.mota.orderservice.dto.ProductDTO;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;

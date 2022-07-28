@@ -18,7 +18,8 @@ public class ProductController {
   private final ProductService productService;
 
   @GetMapping
-  public List<ProductDTO> getProductsByIds(@RequestParam(name = "productIds") List<String> productIdsString) {
+  public List<ProductDTO> getProductsByIds(
+      @RequestParam(name = "productIds") List<String> productIdsString) {
     List<Integer> productIds = productIdsString.stream()
         .map(Integer::parseInt)
         .collect(Collectors.toList());

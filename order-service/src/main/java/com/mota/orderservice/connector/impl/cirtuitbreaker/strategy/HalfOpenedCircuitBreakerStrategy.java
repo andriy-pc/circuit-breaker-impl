@@ -1,5 +1,6 @@
-package com.mota.orderservice.connector.impl;
+package com.mota.orderservice.connector.impl.cirtuitbreaker.strategy;
 
+import com.mota.orderservice.connector.impl.ProductConnectorHelper;
 import com.mota.orderservice.dto.ProductDTO;
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -10,12 +11,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Qualifier("halfOpenedCircuitBreakerStrategy")
-public class HalfOpenCircuitBreakerStrategy extends ClosedCircuitBreakerStrategy {
+public class HalfOpenedCircuitBreakerStrategy extends ClosedCircuitBreakerStrategy {
 
   private static final Integer COUNT_OF_ALLOWED_CALLS = 5;
 
-  public HalfOpenCircuitBreakerStrategy(DefaultProductConnector defaultProductConnector) {
-    super(defaultProductConnector);
+  public HalfOpenedCircuitBreakerStrategy(ProductConnectorHelper productConnectorHelper) {
+    super(productConnectorHelper);
   }
 
   @Override

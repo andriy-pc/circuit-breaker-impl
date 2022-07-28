@@ -34,7 +34,7 @@ public class DefaultProductService implements ProductService {
 
   @Override
   public List<ProductDTO> getByProductIds(List<Integer> productIds) {
-    if(!enabled) {
+    if (!enabled) {
       throw new RuntimeException("Service is not responding!");
     }
     List<ProductEntity> productEntities = productDAO.getAllByProductIds(productIds);

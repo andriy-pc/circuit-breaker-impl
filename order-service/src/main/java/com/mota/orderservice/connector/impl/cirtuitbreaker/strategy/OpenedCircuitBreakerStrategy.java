@@ -1,11 +1,11 @@
-package com.mota.orderservice.connector.impl;
+package com.mota.orderservice.connector.impl.cirtuitbreaker.strategy;
 
+import com.mota.orderservice.connector.impl.ProductConnectorHelper;
 import com.mota.orderservice.dto.ProductDTO;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,8 +17,8 @@ public class OpenedCircuitBreakerStrategy extends
 
   private Long strategyStartEpochMillis = 0L;
 
-  public OpenedCircuitBreakerStrategy(DefaultProductConnector defaultProductConnector) {
-    super(defaultProductConnector);
+  public OpenedCircuitBreakerStrategy(ProductConnectorHelper productConnectorHelper) {
+    super(productConnectorHelper);
   }
 
   @Override
